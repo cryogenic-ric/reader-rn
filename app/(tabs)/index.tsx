@@ -16,7 +16,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome Stack Readerwa!</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
@@ -54,15 +54,15 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 0,
   },
   stepContainer: {
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 28,
   },
   reactLogo: {
-    height: 178,
-    width: 290,
+    height: 278,
+    width: 190,
     bottom: 0,
     left: 0,
     position: 'absolute',

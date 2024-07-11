@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Image, Platform } from 'react-native';
+import { Link } from 'expo-router';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -84,6 +85,7 @@ export default function TabTwoScreen() {
           ),
         })}
       </Collapsible>
+      <Link href="/modal">Present modal</Link>
     </ParallaxScrollView>
   );
 }

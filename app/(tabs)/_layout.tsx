@@ -1,10 +1,13 @@
 import { Tabs } from 'expo-router';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+
+const Tab = createMaterialTopTabNavigator();
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
