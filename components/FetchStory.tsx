@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   ActivityIndicator,
@@ -9,31 +9,22 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import { useTheme, Text, Card } from "react-native-paper";
 import { Link } from "expo-router";
-import type { Post as PostInterface } from "@/utils/types/content";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/StoreProvider";
 import { PostVisibility } from "@/utils/enums";
 
-const FetchDataComponent: React.FC = () => {
+const FetchDataComponent: React.FC = observer(() => {
   const { id } = useLocalSearchParams();
-  const [story, setStory] = useState<PostInterface>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
   const theme = useTheme();
+  const { storyStore } = useStore();
 
   useEffect(() => {
-    fetch(`https://cheryl97.stck.me/api/r/101020/posts/${id}`)
-      .then((response) => response.json())
-      .then((json: PostInterface) => {
-        setStory(json);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        console.error(err);
-        setError(err);
-        setLoading(false);
-      });
+    if (typeof id === "string") {
+      storyStore.fetchStory(id);
+    }
   }, [id]);
 
-  if (loading) {
+  if (storyStore.loading) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
@@ -43,12 +34,14 @@ const FetchDataComponent: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (storyStore.error) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
       >
-        <Text style={{ color: theme.colors.error }}>Error fetching data</Text>
+        <Text style={{ color: theme.colors.error }}>
+          Error fetching data in Story
+        </Text>
       </View>
     );
   }
@@ -67,6 +60,7 @@ const FetchDataComponent: React.FC = () => {
   );
 
   const RenderStory = () => {
+    const story = storyStore.story;
     if (!story) return null;
     return (
       <View style={{ flex: 1 }}>
@@ -101,12 +95,12 @@ const FetchDataComponent: React.FC = () => {
     >
       <RenderStory />
       <Text style={styles.headline}>Chapters</Text>
-      {story?.meta.children?.map((child: any) => (
+      {storyStore.chapters.map((child: any) => (
         <RenderChapterItem key={child.id} item={child} />
       ))}
     </ScrollView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -115,7 +109,6 @@ const styles = StyleSheet.create({
     margin: 15,
     marginTop: 70,
   },
-
   chapterCard: {
     marginBottom: 10,
     padding: 15,

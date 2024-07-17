@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   View,
   ActivityIndicator,
@@ -8,39 +8,23 @@ import {
   Pressable,
 } from "react-native";
 import { useTheme, Text, Card } from "react-native-paper";
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
-
-import type { Post as PostInterface } from "@/utils/types/content";
 import { Link } from "expo-router";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/StoreProvider";
+import { Post } from "@/stores/StoriesStore";
+import { getSnapshot, Instance } from "mobx-state-tree";
 
-const FetchDataComponent: React.FC = () => {
-  const [data, setData] = useState<PostInterface[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+type PostInterface = Instance<typeof Post>;
 
-  const insets = useSafeAreaInsets();
-
+const FetchDataComponent: React.FC = observer(() => {
+  const { storiesStore } = useStore();
   const theme = useTheme();
 
   useEffect(() => {
-    fetch(
-      "https://cheryl97.stck.me/api/r/101020/posts?ptype=parent&sub_type=story"
-    )
-      .then((response) => response.json())
-      .then((json: PostInterface[]) => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err);
-        setLoading(false);
-      });
+    storiesStore.fetchPosts();
   }, []);
 
-  if (loading) {
+  if (storiesStore.loading) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
@@ -50,12 +34,14 @@ const FetchDataComponent: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (storiesStore.error) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
       >
-        <Text style={{ color: theme.colors.error }}>Error fetching data</Text>
+        <Text style={{ color: theme.colors.error }}>
+          Error fetching data in Stories
+        </Text>
       </View>
     );
   }
@@ -90,18 +76,20 @@ const FetchDataComponent: React.FC = () => {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <FlatList
-        data={data}
+        data={getSnapshot(storiesStore.posts) as PostInterface[]} // Convert MST array to plain array
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         ListHeaderComponent={
-          <Text style={styles.headline}>{data[0].author.name}'s Stories</Text>
+          <Text style={styles.headline}>
+            {storiesStore.posts[0]?.author.name}'s Stories
+          </Text>
         }
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -117,7 +105,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     shadowColor: "#9b9b9b",
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1, // Adjust the opacity for shadow
+    shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 10,
   },

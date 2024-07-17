@@ -1,60 +1,29 @@
-import { WebView } from "react-native-webview";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useTheme, Text, Card } from "react-native-paper";
-import type { Post as PostInterface } from "@/utils/types/content";
+import { observer } from "mobx-react-lite";
+import { useStore } from "@/StoreProvider";
+import { useWindowDimensions } from "react-native";
+import RenderHTML from "react-native-render-html";
 
-const FetchDataComponent: React.FC = () => {
+const FetchDataComponent: React.FC = observer(() => {
   const { id } = useLocalSearchParams();
-  const [chapter, setChapter] = useState<PostInterface>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
   const [webViewHeight, setWebViewHeight] = useState<number>(0);
   const theme = useTheme();
   const webViewRef = useRef(null);
 
-  const cssStyles = `
-  body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    padding-bottom: 30px
-  }
-  
-  p, blockquote, h1,h2,h3,h4,h5,h6, br {
-    font-size: 18px;
-    line-height: 1.6;
-    padding: 10px 25px;
-  }
-  img {
-    width: 100%;
-    width: 100vw;
-    margin: 0px 0 10px;
-    padding: 0;
-    height: auto;
-  }
-  * {
-    padding: 0;
-    margin: 0;
-  }
-`;
+  const { chapterStore } = useStore();
+
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
-    fetch(`https://cheryl97.stck.me/api/r/101020/posts/${id}`)
-      .then((response) => response.json())
-      .then((json: PostInterface) => {
-        setChapter(json);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        console.error(err);
-        setError(err);
-        setLoading(false);
-      });
+    if (typeof id === "string") {
+      chapterStore.fetchChapter(id);
+    }
   }, [id]);
 
-  if (loading) {
+  if (chapterStore.loading) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
@@ -64,12 +33,14 @@ const FetchDataComponent: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (chapterStore.error) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
       >
-        <Text style={{ color: theme.colors.error }}>Error fetching data</Text>
+        <Text style={{ color: theme.colors.error }}>
+          Error fetching data in Chapter
+        </Text>
       </View>
     );
   }
@@ -79,6 +50,7 @@ const FetchDataComponent: React.FC = () => {
   };
 
   const RenderChapter = () => {
+    const chapter = chapterStore.chapter;
     if (!chapter) return null;
     return (
       <Card style={styles.card}>
@@ -97,34 +69,87 @@ const FetchDataComponent: React.FC = () => {
     );
   };
 
-  const htmlContent = `
-    <html>
-      <head>
-      <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1, initial-scale=1.0, interactive-widget=resizes-content">
-        <style>${cssStyles}</style>
-        <link rel="stylesheet" type="text/css" href="https://stck.me/static/site/client/assets/Post-54ac3b66.css">
-      </head>
-      <body>
-        ${
-          chapter?.content ||
-          "<p>Content may be paid or restricted to followers</p>"
-        }
-      </body>
-    </html>
-  `;
+  const tagStyles = {
+    body: {
+      fontFamily: "Arial, sans-serif",
+      color: "#333",
+      padding: 5, // Padding values should be numbers for React Native styles
+    },
+    p: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    blockquote: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    h1: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    h2: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    h3: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    h4: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    h5: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    h6: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    br: {
+      fontSize: 18,
+      lineHeight: 30,
+      padding: 5,
+      paddingLeft: 25,
+      paddingRight: 25,
+    },
+    img: {
+      marginVertical: 10,
+      height: "auto",
+    },
+    "*": {
+      padding: 0,
+      margin: 0,
+    },
+  };
 
-  const RenderContent = () => {
-    if (!chapter) return null;
-    return (
-      <WebView
-        ref={webViewRef}
-        javaScriptEnabled={true}
-        originWhitelist={["*"]}
-        source={{ html: htmlContent }}
-        injectedJavaScript="window.ReactNativeWebView.postMessage(document.body.scrollHeight)"
-        onMessage={handleWebViewMessage}
-      />
-    );
+  const source = {
+    html: chapterStore.chapter?.content || "",
   };
 
   return (
@@ -134,10 +159,23 @@ const FetchDataComponent: React.FC = () => {
         { backgroundColor: theme.colors.background, paddingBottom: 0 },
       ]}
     >
-      <RenderContent />
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: theme.colors.background, paddingBottom: 0 },
+        ]}
+      >
+        <RenderChapter />
+        <RenderHTML
+          contentWidth={width}
+          source={{ html: chapterStore.chapter?.content || "" }}
+          ignoredDomTags={["source"]}
+          tagsStyles={tagStyles}
+        />
+      </ScrollView>
     </ScrollView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   card: {
