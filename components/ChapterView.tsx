@@ -1,25 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { useTheme, Text, Card } from "react-native-paper";
+import { useTheme, Text } from "react-native-paper";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/StoreProvider";
 import { useWindowDimensions } from "react-native";
 import RenderHTML from "react-native-render-html";
 
-const FetchDataComponent: React.FC = observer(() => {
-  const { id } = useLocalSearchParams();
-  const [webViewHeight, setWebViewHeight] = useState<number>(0);
+const ChapterView: React.FC = observer(() => {
+  const { id, siteId } = useLocalSearchParams();
   const theme = useTheme();
-  const webViewRef = useRef(null);
 
   const { chapterStore } = useStore();
 
   const { width } = useWindowDimensions();
 
   useEffect(() => {
-    if (typeof id === "string") {
-      chapterStore.fetchChapter(id);
+    if (typeof id === "string" && typeof siteId === "string") {
+      chapterStore.fetchChapter(id, siteId);
     }
   }, [id]);
 
@@ -44,30 +42,6 @@ const FetchDataComponent: React.FC = observer(() => {
       </View>
     );
   }
-
-  const handleWebViewMessage = (event: any) => {
-    setWebViewHeight(Number(event.nativeEvent.data));
-  };
-
-  const RenderChapter = () => {
-    const chapter = chapterStore.chapter;
-    if (!chapter) return null;
-    return (
-      <Card style={styles.card}>
-        <Card.Cover
-          source={{ uri: chapter.meta.cover?.src?.image || "" }}
-          style={styles.cover}
-          resizeMode="cover"
-        />
-        <Text variant="titleLarge" style={styles.title}>
-          {chapter.title}
-        </Text>
-        <Text variant="headlineSmall" style={styles.summary} numberOfLines={2}>
-          {chapter.summary}
-        </Text>
-      </Card>
-    );
-  };
 
   const tagStyles = {
     body: {
@@ -165,13 +139,18 @@ const FetchDataComponent: React.FC = observer(() => {
           { backgroundColor: theme.colors.background, paddingBottom: 0 },
         ]}
       >
-        <RenderChapter />
         <RenderHTML
           contentWidth={width}
           source={{ html: chapterStore.chapter?.content || "" }}
           ignoredDomTags={["source"]}
           tagsStyles={tagStyles}
         />
+        {chapterStore.chapter?.visibility == 1 ? (
+          <Text style={styles.title}>This is a Paid Chapter!</Text>
+        ) : null}
+        {chapterStore.chapter?.visibility == 2 ? (
+          <Text style={styles.title}>This is a Follower Only Chapter!</Text>
+        ) : null}
       </ScrollView>
     </ScrollView>
   );
@@ -201,9 +180,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "bold",
+    fontSize: 24,
     paddingTop: 20,
-    paddingBottom: 15,
-    paddingLeft: 5,
+    paddingBottom: 35,
+    paddingLeft: 25,
+    paddingRight: 25,
   },
   cover: {
     height: 400,
@@ -226,4 +207,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FetchDataComponent;
+export default ChapterView;

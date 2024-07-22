@@ -3,28 +3,28 @@ import {
   View,
   ActivityIndicator,
   StyleSheet,
-  FlatList,
-  ListRenderItem,
+  ScrollView,
   Pressable,
 } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import { useTheme, Text, Card } from "react-native-paper";
 import { Link } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/StoreProvider";
-import { Post } from "@/stores/StoriesStore";
-import { getSnapshot, Instance } from "mobx-state-tree";
+import { PostVisibility } from "@/utils/enums";
 
-type PostInterface = Instance<typeof Post>;
-
-const FetchDataComponent: React.FC = observer(() => {
-  const { storiesStore } = useStore();
+const StoryView: React.FC = observer(() => {
+  const { id, siteId } = useLocalSearchParams();
   const theme = useTheme();
+  const { storyStore } = useStore();
 
   useEffect(() => {
-    storiesStore.fetchPosts();
-  }, []);
+    if (typeof id === "string" && typeof siteId === "string") {
+      storyStore.fetchStory(id, siteId);
+    }
+  }, [id]);
 
-  if (storiesStore.loading) {
+  if (storyStore.loading) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
@@ -34,60 +34,71 @@ const FetchDataComponent: React.FC = observer(() => {
     );
   }
 
-  if (storiesStore.error) {
+  if (storyStore.error) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
       >
         <Text style={{ color: theme.colors.error }}>
-          Error fetching data in Stories
+          Error fetching data in Story
         </Text>
       </View>
     );
   }
 
-  const renderItem: ListRenderItem<PostInterface> = ({ item }) => (
-    <Link href={`/story/${item.id}`} asChild>
+  const RenderChapterItem = ({ item }: { item: any }) => (
+    <Link href={`${item.site_id}/chapter/${item.id}`} asChild>
       <Pressable>
-        <Card style={styles.card}>
-          <Card.Cover
-            source={{ uri: item.meta.cover?.src?.image }}
-            style={styles.cover}
-            resizeMode="cover"
-          />
-
-          <Text variant="titleLarge" style={styles.title}>
-            {item.title}
-          </Text>
-          <Text
-            variant="headlineSmall"
-            style={styles.summary}
-            numberOfLines={2}
-          >
-            {item.summary}
+        <Card style={styles.chapterCard}>
+          <Text style={[styles.chapterTitle, { flex: 1 }]}>{item.title}</Text>
+          <Text style={styles.visibility}>
+            {PostVisibility[item.visibility]}
           </Text>
         </Card>
       </Pressable>
     </Link>
   );
 
-  return (
-    <View
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-    >
-      <FlatList
-        data={getSnapshot(storiesStore.posts) as PostInterface[]} // Convert MST array to plain array
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        ListHeaderComponent={
-          <Text style={styles.headline}>
-            {storiesStore.posts[0]?.author.name}'s Stories
+  const RenderStory = () => {
+    const story = storyStore.story;
+    if (!story) return null;
+    return (
+      <View style={{ flex: 1 }}>
+        <Card style={styles.card}>
+          <Card.Cover
+            source={{ uri: story.meta.cover?.src?.image }}
+            style={styles.cover}
+            resizeMode="cover"
+          />
+
+          <Text variant="titleLarge" style={styles.title}>
+            {story.title}
           </Text>
-        }
-      />
-    </View>
+          <Text
+            variant="headlineSmall"
+            style={styles.summary}
+            numberOfLines={2}
+          >
+            {story.summary}
+          </Text>
+        </Card>
+      </View>
+    );
+  };
+
+  return (
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: theme.colors.background, paddingBottom: 30 },
+      ]}
+    >
+      <RenderStory />
+      <Text style={styles.headline}>Chapters</Text>
+      {storyStore.chapters.map((child: any) => (
+        <RenderChapterItem key={child.id} item={child} />
+      ))}
+    </ScrollView>
   );
 });
 
@@ -97,15 +108,22 @@ const styles = StyleSheet.create({
     padding: 15,
     margin: 15,
     marginTop: 70,
+  },
+  chapterCard: {
+    marginBottom: 10,
+    padding: 15,
+    margin: 15,
+    marginTop: 10,
     paddingBottom: 0,
+    shadowOpacity: 0,
   },
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingTop: 0,
     borderRadius: 0,
     shadowColor: "#9b9b9b",
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.1, // Adjust the opacity for shadow
     shadowRadius: 20,
     elevation: 10,
   },
@@ -127,15 +145,10 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontWeight: "bold",
-    fontSize: 26,
-    paddingTop: 26,
-    paddingBottom: 0,
-    paddingLeft: 30,
-    shadowColor: "#9b9b9b",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
+    paddingTop: 20,
+    paddingBottom: 10,
+    fontSize: 20,
+    padding: 20,
   },
   cover: {
     height: 400,
@@ -156,6 +169,23 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     lineHeight: 26,
   },
+  chapterTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+    paddingTop: 0,
+    padding: 15,
+    paddingLeft: 5,
+    paddingBottom: 10,
+  },
+  visibility: {
+    flex: 1,
+    paddingTop: 0,
+    paddingLeft: 5,
+    paddingBottom: 10,
+    opacity: 0.6,
+    fontSize: 12,
+    textTransform: "uppercase",
+  },
 });
 
-export default FetchDataComponent;
+export default StoryView;

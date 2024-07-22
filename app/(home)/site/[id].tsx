@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
-import FetchStory from "@/components/FetchStory";
+import StoriesView from "@/components/StoriesView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function TabTwoScreen() {
+export default function Site() {
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -12,7 +12,7 @@ export default function TabTwoScreen() {
         backgroundColor: "rgba(255,255,255,0.6)",
       }}
     >
-      <FetchStory></FetchStory>
+      <StoriesView></StoriesView>
     </View>
   );
 }

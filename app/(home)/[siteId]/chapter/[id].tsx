@@ -1,6 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import FetchStories from "@/components/FetchStories";
-import SearchSites from "@/components/SearchSites";
+import ChapterView from "@/components/ChapterView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabTwoScreen() {
@@ -13,8 +12,7 @@ export default function TabTwoScreen() {
         backgroundColor: "rgba(255,255,255,0.6)",
       }}
     >
-      <SearchSites></SearchSites>
-      {/* <FetchStories></FetchStories> */}
+      <ChapterView></ChapterView>
     </View>
   );
 }

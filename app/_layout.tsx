@@ -3,6 +3,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { TransitionPresets } from "@react-navigation/stack";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -35,14 +36,24 @@ export default function RootLayout() {
     <StoreProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
-          <Stack.Screen name="(home)/index" options={{ headerShown: false }} />
           <Stack.Screen
-            name="(home)/story/[id]"
-            options={{ headerShown: false }}
+            name="(home)/index"
+            options={{
+              animation: "ios",
+              headerShown: false,
+            }}
           />
           <Stack.Screen
-            name="(home)/chapter/[id]"
-            options={{ headerShown: false }}
+            name="(home)/[siteId]/story/[id]"
+            options={{ animation: "ios", headerShown: false }}
+          />
+          <Stack.Screen
+            name="(home)/[siteId]/chapter/[id]"
+            options={{ animation: "ios", headerShown: false }}
+          />
+          <Stack.Screen
+            name="(home)/site/[id]"
+            options={{ animation: "ios", headerShown: false }}
           />
           <Stack.Screen
             name="modal"

@@ -28,12 +28,12 @@ const StoryStore = types
       self.story = Post.create(storyData);
     };
 
-    const fetchStory = flow(function* (id: string) {
+    const fetchStory = flow(function* (id: string, siteId: string) {
       setLoading(true);
       setError(null);
       try {
         const response: Response = yield fetch(
-          `https://cheryl97.stck.me/api/r/101020/posts/${id}`
+          `https://stck.me/api/r/${siteId}/posts/${id}`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

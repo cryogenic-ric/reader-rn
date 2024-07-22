@@ -37,12 +37,12 @@ const StoriesStore = types
     error: types.maybeNull(types.string),
   })
   .actions((self) => ({
-    fetchPosts: flow(function* () {
+    fetchPosts: flow(function* (id) {
       self.loading = true;
       self.error = null;
       try {
         const response: Response = yield fetch(
-          "https://cheryl97.stck.me/api/r/101020/posts?ptype=parent&sub_type=story"
+          `https://stck.me/api/r/${id}/posts?ptype=parent&sub_type=story`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
