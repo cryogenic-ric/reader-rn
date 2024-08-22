@@ -25,9 +25,8 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
-        <data android:scheme="com.anonymous.reader"/>
-        <data android:scheme="exp+reader"/>
         <data android:scheme="com.anonymous.reader.test"/>
+        <data android:scheme="exp+reader"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

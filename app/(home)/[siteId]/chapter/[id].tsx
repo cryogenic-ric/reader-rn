@@ -1,6 +1,10 @@
 import { StyleSheet, View } from "react-native";
 import ChapterView from "@/components/ChapterView";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  ChapterThemeProvider,
+  useChapterTheme,
+} from "@/provider/ChapterThemeContext";
 
 export default function TabTwoScreen() {
   const insets = useSafeAreaInsets();
@@ -12,7 +16,9 @@ export default function TabTwoScreen() {
         backgroundColor: "rgba(255,255,255,0.6)",
       }}
     >
-      <ChapterView></ChapterView>
+      <ChapterThemeProvider>
+        <ChapterView></ChapterView>
+      </ChapterThemeProvider>
     </View>
   );
 }

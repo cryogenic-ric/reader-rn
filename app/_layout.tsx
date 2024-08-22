@@ -10,6 +10,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { StoreProvider } from "@/StoreProvider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -33,38 +34,42 @@ export default function RootLayout() {
   }
 
   return (
-    <StoreProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen
-            name="(home)/index"
-            options={{
-              animation: "ios",
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="(home)/[siteId]/story/[id]"
-            options={{ animation: "ios", headerShown: false }}
-          />
-          <Stack.Screen
-            name="(home)/[siteId]/chapter/[id]"
-            options={{ animation: "ios", headerShown: false }}
-          />
-          <Stack.Screen
-            name="(home)/site/[id]"
-            options={{ animation: "ios", headerShown: false }}
-          />
-          <Stack.Screen
-            name="modal"
-            options={{
-              // Set the presentation mode to modal for our modal route.
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ThemeProvider>
-    </StoreProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StoreProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen
+              name="(home)/index"
+              options={{
+                animation: "ios",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="(home)/[siteId]/story/[id]"
+              options={{ animation: "ios", headerShown: false }}
+            />
+            <Stack.Screen
+              name="(home)/[siteId]/chapter/[id]"
+              options={{ animation: "ios", headerShown: false }}
+            />
+            <Stack.Screen
+              name="(home)/site/[id]"
+              options={{ animation: "ios", headerShown: false }}
+            />
+            <Stack.Screen
+              name="modal"
+              options={{
+                // Set the presentation mode to modal for our modal route.
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemeProvider>
+      </StoreProvider>
+    </GestureHandlerRootView>
   );
 }

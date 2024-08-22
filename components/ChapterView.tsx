@@ -1,31 +1,71 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Animated,
+  ScrollView,
+  ActivityIndicator,
+  useWindowDimensions,
+  TouchableOpacity,
+  StatusBar,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useTheme, Text } from "react-native-paper";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/StoreProvider";
-import { useWindowDimensions } from "react-native";
 import RenderHTML from "react-native-render-html";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { contentTagStyles } from "@/utils";
+import Header from "@/components/chapter/HeaderBar";
+import BottomBar from "@/components/chapter/BottomBar";
+import Customise from "@/components/chapter/Customise";
+import { useChapterTheme } from "@/provider/ChapterThemeContext";
 
 const ChapterView: React.FC = observer(() => {
-  const { id, siteId } = useLocalSearchParams();
-  const theme = useTheme();
-
   const { chapterStore } = useStore();
-
+  const theme = useTheme();
+  const { id, siteId } = useLocalSearchParams();
+  const { bottom } = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const { currentScheme } = useChapterTheme();
+
+  const [barVisibility, setBarVisibility] = useState(true);
+  const [customiseVisibility, setCustomiseVisibility] = useState(false);
+
+  const appbarAnimation = useRef(new Animated.Value(1)).current;
+  const bottombarAnimation = useRef(new Animated.Value(1)).current;
+
+  const toggleBars = () => setBarVisibility((prev) => !prev);
+  const toggleCustomise = () => setCustomiseVisibility((prev) => !prev);
+
+  useEffect(() => {
+    Animated.timing(appbarAnimation, {
+      toValue: barVisibility ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [barVisibility]);
+
+  useEffect(() => {
+    Animated.timing(bottombarAnimation, {
+      toValue: barVisibility ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [barVisibility]);
 
   useEffect(() => {
     if (typeof id === "string" && typeof siteId === "string") {
       chapterStore.fetchChapter(id, siteId);
     }
-  }, [id]);
+  }, [id, siteId]);
 
   if (chapterStore.loading) {
     return (
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
       >
+        <StatusBar hidden={true} />
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
@@ -43,167 +83,72 @@ const ChapterView: React.FC = observer(() => {
     );
   }
 
-  const tagStyles = {
-    body: {
-      fontFamily: "Arial, sans-serif",
-      color: "#333",
-      padding: 5, // Padding values should be numbers for React Native styles
-    },
-    p: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    blockquote: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    h1: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    h2: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    h3: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    h4: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    h5: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    h6: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    br: {
-      fontSize: 18,
-      lineHeight: 30,
-      padding: 5,
-      paddingLeft: 25,
-      paddingRight: 25,
-    },
-    img: {
-      marginVertical: 10,
-      height: "auto",
-    },
-    "*": {
-      padding: 0,
-      margin: 0,
-    },
-  };
-
-  const source = {
-    html: chapterStore.chapter?.content || "",
-  };
-
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: theme.colors.background, paddingBottom: 0 },
-      ]}
-    >
+    <View style={styles.container}>
+      <StatusBar
+        animated={true}
+        translucent={false}
+        backgroundColor="transparent"
+        showHideTransition={"slide"}
+        hidden={true}
+      />
+      <Header
+        appbarAnimation={appbarAnimation}
+        barVisibility={barVisibility}
+        storyTitle={chapterStore.chapter?.parent?.title}
+      />
       <ScrollView
+        onScroll={() => setBarVisibility(false)}
         contentContainerStyle={[
-          styles.container,
-          { backgroundColor: theme.colors.background, paddingBottom: 0 },
+          styles.scrollView,
+          { paddingTop: 100, backgroundColor: currentScheme.backgroundColor },
         ]}
       >
-        <RenderHTML
-          contentWidth={width}
-          source={{ html: chapterStore.chapter?.content || "" }}
-          ignoredDomTags={["source"]}
-          tagsStyles={tagStyles}
-        />
-        {chapterStore.chapter?.visibility == 1 ? (
+        <TouchableOpacity onPress={toggleBars} activeOpacity={1}>
+          <Text style={{ ...styles.title, color: currentScheme.textColor }}>
+            {chapterStore.chapter?.title}
+          </Text>
+          <RenderHTML
+            contentWidth={width}
+            source={{ html: chapterStore.chapter?.content || "" }}
+            ignoredDomTags={["source"]}
+            tagsStyles={{
+              ...contentTagStyles,
+              body: {
+                fontFamily: "Arial, sans-serif",
+                color: currentScheme.textColor,
+                padding: 5,
+              },
+            }}
+          />
+        </TouchableOpacity>
+        {chapterStore.chapter?.visibility === 1 && (
           <Text style={styles.title}>This is a Paid Chapter!</Text>
-        ) : null}
-        {chapterStore.chapter?.visibility == 2 ? (
+        )}
+        {chapterStore.chapter?.visibility === 2 && (
           <Text style={styles.title}>This is a Follower Only Chapter!</Text>
-        ) : null}
+        )}
       </ScrollView>
-    </ScrollView>
+      {customiseVisibility && <Customise onClose={toggleCustomise} />}
+      <BottomBar
+        bottombarAnimation={bottombarAnimation}
+        bottomInset={bottom}
+        onCustomisePress={toggleCustomise}
+      />
+    </View>
   );
 });
 
 const styles = StyleSheet.create({
-  card: {
-    marginBottom: 10,
-    padding: 15,
-    margin: 15,
-    marginTop: 70,
-  },
-  container: {
-    flexGrow: 1,
-    paddingTop: 0,
-    borderRadius: 0,
-    shadowColor: "#9b9b9b",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  container: { flex: 1, position: "relative" },
+  scrollView: { flexGrow: 1 },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: {
     fontWeight: "bold",
-    fontSize: 24,
-    paddingTop: 20,
-    paddingBottom: 35,
-    paddingLeft: 25,
-    paddingRight: 25,
-  },
-  cover: {
-    height: 400,
-    objectFit: "cover",
-    minHeight: 150,
-    maxHeight: 400,
-    minWidth: 150,
-    maxWidth: "100%",
-    borderRadius: 16,
-    marginTop: -50,
-  },
-  summary: {
-    paddingTop: 0,
-    fontSize: 16,
-    paddingBottom: 20,
-    paddingLeft: 5,
-    color: "#333",
-    opacity: 0.7,
-    lineHeight: 26,
+    fontSize: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 25,
+    textAlign: "center",
   },
 });
 

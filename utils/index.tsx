@@ -24,3 +24,21 @@ export const nativeShare = async (permalink: string) => {
 export const addHaptic = async () => {
   await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 };
+
+export const contentTagStyles = {
+  p: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  blockquote: {
+    fontSize: 18,
+    lineHeight: 30,
+    padding: 5,
+    paddingHorizontal: 25,
+  },
+  h1: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  h2: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  h3: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  h4: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  h5: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  h6: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  br: { fontSize: 18, lineHeight: 30, padding: 5, paddingHorizontal: 25 },
+  img: { marginVertical: 10, height: "auto" },
+};

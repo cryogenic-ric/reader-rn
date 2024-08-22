@@ -7,7 +7,7 @@ import {
   Pressable,
 } from "react-native";
 import { useTheme, Text, Avatar, IconButton } from "react-native-paper";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/StoreProvider";
 import { ISite } from "@/stores/SearchStore";
@@ -23,6 +23,7 @@ const FetchDataComponent: React.FC = observer(() => {
   const theme = useTheme();
   const { searchStore } = useStore();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
     if (searchQuery) {
@@ -31,6 +32,10 @@ const FetchDataComponent: React.FC = observer(() => {
       searchStore.fetchTrendingSites();
     }
   }, [searchQuery]);
+
+  // useEffect(() => {
+  //   router.replace("/101020/chapter/229071");
+  // }, []);
 
   const filteredSites = () => {
     if (searchQuery) return searchStore.sites;
