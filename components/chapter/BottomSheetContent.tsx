@@ -1,9 +1,10 @@
 import React from "react";
 import { View, StyleSheet, Pressable, TouchableOpacity } from "react-native";
-import { Text, IconButton, Switch, Button } from "react-native-paper";
+import { Text, IconButton, Switch, Button, useTheme } from "react-native-paper";
 import { useChapterTheme } from "@/provider/ChapterThemeContext";
 
 const BottomSheetContent: React.FC = () => {
+  const theme = useTheme();
   const [isSwitchOn, setIsSwitchOn] = React.useState(false);
   const { currentScheme, changeThemeColor } = useChapterTheme();
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);

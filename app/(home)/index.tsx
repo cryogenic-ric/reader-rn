@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-import FetchStories from "@/components/FetchStories";
 import SearchSites from "@/components/SearchSites";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
