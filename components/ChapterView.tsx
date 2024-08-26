@@ -65,7 +65,6 @@ const ChapterView: React.FC = observer(() => {
       <View
         style={[styles.center, { backgroundColor: theme.colors.background }]}
       >
-        <StatusBar hidden={true} />
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );

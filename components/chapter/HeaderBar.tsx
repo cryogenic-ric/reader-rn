@@ -1,6 +1,6 @@
 import React from "react";
 import { Animated, StyleSheet, StatusBar } from "react-native";
-import { Appbar } from "react-native-paper";
+import { Appbar, useTheme } from "react-native-paper";
 import { useNavigation } from "expo-router";
 
 interface HeaderProps {
@@ -15,6 +15,7 @@ const Header: React.FC<HeaderProps> = ({
   barVisibility,
 }) => {
   const navigation = useNavigation();
+  const theme = useTheme();
 
   return (
     <Animated.View
@@ -32,7 +33,11 @@ const Header: React.FC<HeaderProps> = ({
         },
       ]}
     >
-      <Appbar.Header style={styles.appbar}>
+      <Appbar.Header
+        style={
+          (styles.appbar, { backgroundColor: theme.colors.elevation.level3 })
+        }
+      >
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title={storyTitle || ""} titleStyle={styles.title} />
         <Appbar.Action icon="format-list-bulleted" onPress={() => {}} />

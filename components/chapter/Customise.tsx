@@ -12,6 +12,7 @@ import BottomSheet, {
   BottomSheetView,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
+import { useTheme } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheetContent from "./BottomSheetContent";
 import { useBottomSheetBackHandler } from "@/hooks/useBottomSheetBackHandler";
@@ -21,6 +22,7 @@ interface CustomiseProps {
 }
 
 const Customise: React.FC<CustomiseProps> = ({ onClose }) => {
+  const theme = useTheme();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const { handleSheetPositionChange } =
     useBottomSheetBackHandler(bottomSheetModalRef);
@@ -61,7 +63,7 @@ const Customise: React.FC<CustomiseProps> = ({ onClose }) => {
         ref={bottomSheetModalRef}
         index={0}
         onChange={handleSheetChanges}
-        backgroundStyle={{ backgroundColor: "#ebf4eb" }}
+        backgroundStyle={{ backgroundColor: theme.colors.elevation.level3 }}
       >
         <BottomSheetView style={styles.contentContainer}>
           <BottomSheetContent></BottomSheetContent>
@@ -76,7 +78,6 @@ const styles = StyleSheet.create({
 
   contentContainer: {
     alignItems: "center",
-    backgroundColor: "#ebf4eb",
     paddingHorizontal: 16,
   },
   sheetContainer: {

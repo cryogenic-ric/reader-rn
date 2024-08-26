@@ -1,6 +1,6 @@
 import React from "react";
 import { Animated, View, StyleSheet } from "react-native";
-import { Appbar, Text } from "react-native-paper";
+import { Appbar, Text, useTheme } from "react-native-paper";
 
 interface BottomBarProps {
   bottombarAnimation: Animated.Value;
@@ -13,6 +13,7 @@ const BottomBar: React.FC<BottomBarProps> = ({
   bottomInset,
   onCustomisePress,
 }) => {
+  const theme = useTheme();
   return (
     <Animated.View
       style={[
@@ -30,7 +31,13 @@ const BottomBar: React.FC<BottomBarProps> = ({
       ]}
     >
       <Appbar
-        style={[styles.bottombar, { height: 60 + bottomInset }]}
+        style={[
+          styles.bottombar,
+          {
+            height: 60 + bottomInset,
+            backgroundColor: theme.colors.elevation.level3,
+          },
+        ]}
         safeAreaInsets={{ bottom: bottomInset }}
       >
         <View style={styles.actionGroup}>
@@ -57,7 +64,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   bottombar: {
-    backgroundColor: "#e5efe6",
     paddingHorizontal: 0,
     width: "100%",
     flexDirection: "row",

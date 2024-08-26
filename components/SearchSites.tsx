@@ -6,7 +6,15 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import { useTheme, Text, Avatar, IconButton } from "react-native-paper";
+import {
+  useTheme,
+  Card,
+  Text,
+  Avatar,
+  IconButton,
+  Searchbar,
+  useTheme as usePaperTheme,
+} from "react-native-paper";
 import { Link, useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/StoreProvider";
@@ -15,12 +23,11 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  FadeInDown,
 } from "react-native-reanimated";
 import debounce from "lodash/debounce";
 
 const FetchDataComponent: React.FC = observer(() => {
-  const theme = useTheme();
+  const theme = usePaperTheme();
   const { searchStore } = useStore();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const router = useRouter();
@@ -51,9 +58,7 @@ const FetchDataComponent: React.FC = observer(() => {
 
   if (searchStore.error) {
     return (
-      <View
-        style={[styles.center, { backgroundColor: theme.colors.background }]}
-      >
+      <View style={[styles.center]}>
         <Text style={{ color: theme.colors.error }}>
           Error fetching data in Story
         </Text>
@@ -79,8 +84,27 @@ const FetchDataComponent: React.FC = observer(() => {
 
     if (!site) return null;
     return (
-      <Animated.View style={[styles.animatedContainer, animatedStyle]}>
-        <Link href={`/site/${site.id}`} style={{ flex: 1 }} asChild>
+      <Animated.View
+        style={[
+          styles.animatedContainer,
+          animatedStyle,
+          {
+            backgroundColor: theme.colors.elevation.level3,
+            borderWidth: 0,
+            elevation: 5,
+          },
+        ]}
+      >
+        <Link
+          href={`/site/${site.id}`}
+          style={{
+            flex: 1,
+            flexGrow: 1,
+            borderWidth: 0,
+            elevation: 0,
+          }}
+          asChild
+        >
           <Pressable
             style={({ pressed }) => [
               pressed && { transform: [{ scale: 0.98 }] },
@@ -98,7 +122,9 @@ const FetchDataComponent: React.FC = observer(() => {
                 style={styles.avatar}
               />
               <View style={styles.textContainer}>
-                <Text style={styles.name}>{site.name}</Text>
+                <Text style={{ ...styles.name, color: theme.colors.primary }}>
+                  {site.name}
+                </Text>
                 <Text style={styles.domain}>@{site.domain.split(".")[0]}</Text>
               </View>
               <IconButton icon="arrow-right" size={20} style={styles.icon} />
@@ -114,22 +140,12 @@ const FetchDataComponent: React.FC = observer(() => {
       <View style={styles.fixedHeader}>
         <Text style={styles.headline}>Search storytellers</Text>
         <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
+          <Searchbar
             placeholder="Search"
-            value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor="#999"
-            underlineColorAndroid="transparent"
+            value={searchQuery}
+            style={{ elevation: 5 }}
           />
-          {searchQuery ? (
-            <IconButton
-              icon="close"
-              size={20}
-              style={styles.clearIcon}
-              onPress={() => setSearchQuery("")}
-            />
-          ) : null}
         </View>
       </View>
       <ScrollView
@@ -138,7 +154,6 @@ const FetchDataComponent: React.FC = observer(() => {
         contentContainerStyle={[
           styles.scrollContainer,
           {
-            backgroundColor: theme.colors.background,
             paddingBottom: 30,
             paddingTop: 10,
           },
@@ -157,18 +172,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fixedHeader: {
-    backgroundColor: "#fff",
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
     zIndex: 1,
-    elevation: 4, // Android-like shadow
+    elevation: 0, // Android-like shadow
   },
   headline: {
     fontWeight: "bold",
-    fontSize: 24,
+    fontSize: 28,
     padding: 20,
-    paddingBottom: 10,
+    paddingBottom: 20,
   },
   searchContainer: {
     flexDirection: "row",
@@ -179,11 +192,9 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 15,
-    backgroundColor: "#f0f0f0",
     marginRight: 10,
   },
   clearIcon: {
@@ -198,24 +209,18 @@ const styles = StyleSheet.create({
     flexBasis: "auto",
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    backgroundColor: "#fff",
-    marginHorizontal: 10,
-    marginVertical: 5,
+    padding: 15,
+    marginHorizontal: 20,
+    marginVertical: 10,
     borderRadius: 10,
-    elevation: 2,
   },
   siteContainer: {
-    borderColor: "red",
     borderWidth: 1,
     flex: 1,
     display: "flex",
     flexGrow: 1,
     width: 600,
     borderBottomWidth: 1,
-    backgroundColor: "#fff",
     marginHorizontal: 10,
     marginVertical: 5,
     borderRadius: 10,
@@ -236,7 +241,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   domain: {
-    color: "#777",
+    opacity: 0.5,
   },
   icon: {
     alignSelf: "center",
@@ -250,13 +255,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff", // Background color to match the app theme
   },
   loaderText: {
     marginTop: 20,
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333", // Loader text color
   },
 });
 

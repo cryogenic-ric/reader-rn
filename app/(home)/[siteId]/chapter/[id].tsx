@@ -13,7 +13,6 @@ export default function TabTwoScreen() {
       style={{
         flex: 1,
         paddingTop: insets.top,
-        backgroundColor: "rgba(255,255,255,0.6)",
       }}
     >
       <ChapterThemeProvider>

@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
   item: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
   },
   title: {
     fontWeight: "bold",
@@ -165,7 +164,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingBottom: 20,
     paddingLeft: 5,
-    color: "#333",
     opacity: 0.7,
     lineHeight: 26,
   },

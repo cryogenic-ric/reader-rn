@@ -213,7 +213,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingBottom: 20,
     paddingLeft: 5,
-    color: "#333",
     opacity: 0.7,
   },
   chapterText: {

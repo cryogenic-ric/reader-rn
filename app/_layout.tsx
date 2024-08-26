@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import {
   DarkTheme,
   DefaultTheme,
@@ -58,8 +59,8 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={paperTheme}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PaperProvider theme={paperTheme}>
         <StoreProvider>
           <ThemeProvider value={navigationTheme}>
             <Stack>
@@ -93,7 +94,7 @@ export default function RootLayout() {
             </Stack>
           </ThemeProvider>
         </StoreProvider>
-      </GestureHandlerRootView>
-    </PaperProvider>
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 }
